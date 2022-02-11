@@ -10,5 +10,5 @@ This is very much a work in progress and supports very little so far.
 ## Usage
 
 ```elixir
-Yamlix.dump(object)
+Yamlix.dump(object, keyword)
 ```
