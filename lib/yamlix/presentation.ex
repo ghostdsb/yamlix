@@ -1,10 +1,10 @@
 defmodule Presentation do
   alias RepresentationGraph.Node
-  @special_chars ~w(: { } [ ] , & * # ? | - < > = ! % @ \\)
+  # @special_chars ~w(: { } [ ] , & * # ? | - < > = ! % @)
 
   def present(tree, wrap \\ true) do
     if wrap do
-      "--- " <>
+      "---" <>
         produce(tree) <>
         "...\n"
     else
@@ -24,7 +24,7 @@ defmodule Presentation do
     literal(node, 0) <> "\n"
   end
 
-  defp block_sequence(%Node{value: list, tag: t}, n) do
+  defp block_sequence(%Node{value: list, tag: _t}, n) do
     list
     |> List.foldl("\n", fn val, acc ->
       acc <> indent(n) <> "- " <> sequence_element(val, n + 1)
@@ -35,7 +35,7 @@ defmodule Presentation do
     block_sequence(%Node{value: list, tag: t}, n)
   end
 
-  defp sequence_element(%Node{value: map, tag: t}, n) when is_map(map) do
+  defp sequence_element(%Node{value: map, tag: _t}, n) when is_map(map) do
     case Map.keys(map) do
       [] ->
         "{}\n"
@@ -53,7 +53,7 @@ defmodule Presentation do
     literal(node, 0) <> "\n"
   end
 
-  defp block_mapping(%Node{value: map, tag: t}, n) do
+  defp block_mapping(%Node{value: map, tag: _t}, n) do
     Map.keys(map)
     |> List.foldl("\n", fn key, acc ->
       acc <> indent(n) <> mapping_pair(map, key, n)
@@ -94,11 +94,7 @@ defmodule Presentation do
     String.duplicate(" ", level * 2)
   end
 
-  defp escape(string) do
-    if String.contains?(string, @special_chars) do
-      "\"#{string}\""
-    else
-      string
-    end
-  end
+  defp escape("/" <> _word = string), do: string
+  defp escape("$" <> _word = string), do: "\"#{string}\""
+  defp escape(string), do: string
 end
